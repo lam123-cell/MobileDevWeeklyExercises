@@ -10,18 +10,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.homework.R
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.homework.viewmodel.SharedViewModel
+import com.example.homework.viewmodel.TaskViewModel
+import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable
-fun AddTaskScreen(navController: NavController,sharedViewModel: SharedViewModel = viewModel()) {
-    var task by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+fun AddTaskScreen(navController: NavController,viewModel: TaskViewModel = viewModel()) {
+    var taskTitle by remember { mutableStateOf(TextFieldValue("")) }
+    var taskDescription by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(
         topBar = {
@@ -61,9 +66,10 @@ fun AddTaskScreen(navController: NavController,sharedViewModel: SharedViewModel 
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 OutlinedTextField(
-                    value = task,
-                    onValueChange = { task = it },
-                    modifier = Modifier.fillMaxWidth()
+                    value = taskTitle,
+                    onValueChange = { taskTitle = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                 )
             }
             Column {
@@ -73,8 +79,9 @@ fun AddTaskScreen(navController: NavController,sharedViewModel: SharedViewModel 
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
+                    value = taskDescription,
+                    onValueChange = { taskDescription = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
@@ -83,8 +90,8 @@ fun AddTaskScreen(navController: NavController,sharedViewModel: SharedViewModel 
             Button(
                 onClick = {
                     // Thêm task vào danh sách và quay về ListScreen
-                    if (task.isNotEmpty() && description.isNotEmpty()) {
-                        sharedViewModel.addTask(TaskItem(task, description))
+                    if (taskTitle.text.isNotBlank() && taskDescription.text.isNotBlank()) {
+                        viewModel.addTask(taskTitle.text, taskDescription.text)
                         navController.popBackStack()
                     }
                 },
@@ -98,4 +105,10 @@ fun AddTaskScreen(navController: NavController,sharedViewModel: SharedViewModel 
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewAddTaskScreen() {
+    AddTaskScreen(navController = rememberNavController())
 }

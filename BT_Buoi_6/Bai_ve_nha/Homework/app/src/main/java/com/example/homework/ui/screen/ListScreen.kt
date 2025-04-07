@@ -4,7 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -25,16 +25,16 @@ import com.example.homework.R
 import androidx.navigation.NavController
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.homework.viewmodel.SharedViewModel
-import android.util.Log
+import com.example.homework.viewmodel.TaskViewModel
+import com.example.homework.ui.component.TaskItem
+import androidx.compose.runtime.getValue
 
-data class TaskItem(val task: String, val description: String)
 
 @Composable
-fun ListScreen(navController: NavController,sharedViewModel: SharedViewModel = viewModel()) {
-    var selectedItem by remember { mutableStateOf(0) }
-    val tasks by sharedViewModel.taskList.collectAsState()
-    Log.d("ListScreen", "Tasks: $tasks")
+fun ListScreen(navController: NavController,viewModel: TaskViewModel = viewModel()) {
+    var selectedItem by remember { mutableStateOf(3) }
+    val tasks = viewModel.tasks.collectAsState().value
+
 
     Scaffold(
         bottomBar = {
@@ -55,7 +55,7 @@ fun ListScreen(navController: NavController,sharedViewModel: SharedViewModel = v
                     icon = { Icon(Icons.Filled.Add, contentDescription = "Add") },
                     label = { Text("Add") },
                     selected = selectedItem == 2,
-                    onClick = { navController.navigate("addTaskScreen") } // Điều hướng đến AddTaskScreen
+                    onClick = { navController.navigate("add_task") } // Điều hướng đến AddTaskScreen
                 )
                 BottomNavigationItem(
                     icon = { Icon(Icons.Filled.List, contentDescription = "List") },
@@ -92,12 +92,12 @@ fun ListScreen(navController: NavController,sharedViewModel: SharedViewModel = v
                     )
                 }
                 Text("List",
-                    style = MaterialTheme.typography.h6,
+                    style = MaterialTheme.typography.headlineSmall,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF33CCFF)
                 )
-                IconButton(onClick = { navController.navigate("addTaskScreen") }) { // Điều hướng đến AddTaskScreen
+                IconButton(onClick = { navController.navigate("add_task") }) { // Điều hướng đến AddTaskScreen
                     Image(
                         painter = painterResource(id = R.drawable.add),
                         contentDescription = "Add",
@@ -112,36 +112,13 @@ fun ListScreen(navController: NavController,sharedViewModel: SharedViewModel = v
                     .weight(1f)
                     .padding(16.dp)
             ) {
-                items(tasks) { taskItem -> // Hiển thị danh sách tasks
-                    ListItem(
-                        text = { Text(taskItem.task) },
-                        secondaryText = { Text(taskItem.description) },
-                        modifier = Modifier.padding(8.dp),
-                        backgroundColor = Color.LightGray.copy(alpha = 0.5f)
-                    )
+                items(tasks) { task ->
+                    TaskItem(task)
                 }
+
             }
         }
     }
 }
 
-@Composable
-fun ListItem(
-    text: @Composable () -> Unit,
-    secondaryText: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.Transparent
-) {
-    Surface(
-        color = backgroundColor,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            text()
-            secondaryText()
-        }
-    }
-}
+
